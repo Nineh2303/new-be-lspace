@@ -1,0 +1,46 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../src/generated/client"
+  binaryTargets = ["native", "windows", "debian-openssl-3.0.x"]
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  picture   String?
+  googleId  String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VideoItem {
+  id         Int     @id @default(autoincrement())
+  category   String
+  thumbnail  String
+  title      String
+  duration   String
+  instructor String
+  views      String
+  videoUrl   String?
+}
+
+model LeaderboardItem {
+  id     Int    @id @default(autoincrement())
+  rank   Int
+  init   String
+  name   String
+  type   String
+  points String
+}
+
+model DayActivity {
+  id     Int       @id @default(autoincrement())
+  day    String
+  active Boolean[]
+}

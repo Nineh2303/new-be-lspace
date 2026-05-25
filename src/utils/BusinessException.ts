@@ -1,6 +1,7 @@
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 
-export declare class BussinessException extends HttpException {
-  ErrorCode: string;
-  Message: string;
+export declare class BusinessException extends HttpException {
+  errorCode?: any;
+  errorMessage?: string;
+  constructor(errorCode?: any, errorMessage?: string);
 }
