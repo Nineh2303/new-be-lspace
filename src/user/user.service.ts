@@ -9,20 +9,18 @@ import { LoginTicket, OAuth2Client, TokenPayload } from 'google-auth-library';
 import { IGoogleLoginRequest } from './models/user.request';
 import { GoogleLoginResponse } from './models/user.response';
 import { ApiResponse } from '../utils/ApiResponse';
+import { AuthService } from '../auth/auth.service';
+import { JWTSignPayload } from '../auth/model/JWTSignPayload';
 
-export interface IUser {
-  id: string;
-  email: string;
-  name: string;
-  picture?: string;
-  googleId?: string;
-}
 
 @Injectable()
 class UserService {
   private readonly client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Inject(AuthService) private readonly auth: AuthService ,
+  ) {}
 
   async googleLogin(
     request: IGoogleLoginRequest,
@@ -50,25 +48,33 @@ class UserService {
           email: payload.email,
         },
       });
-      if (!user) {
-        user = await this.prisma.user.create({
-          data: {
-            email: payload.email,
-            name: payload.name,
-            picture: payload.picture,
-            googleId: payload.sub,
-          },
-        });
-      }
+      user ??= await this.prisma.user.create({
+        data: {
+          email: payload.email,
+          name: payload.name,
+          avatarUrl: payload.picture,
+          googleId: payload.sub,
+          given_name: payload.given_name,
+          family_name: payload.family_name,
+        },
+      });
       /**
        * TODO:
        * Generate JWT token here
        */
+      const accessToken = this.auth.generateAccessToken({
+        email: user.email,
+        name: user.name,
+      } as JWTSignPayload);
+
       return ApiResponse.success(
         new GoogleLoginResponse(
           user.name,
           user.email,
-          user.picture ?? undefined,
+          user.avatarUrl ?? undefined,
+          user.given_name ?? undefined,
+          user.family_name ?? undefined,
+          accessToken,
         ),
       );
     } catch (error) {

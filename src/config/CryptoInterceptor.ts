@@ -13,22 +13,13 @@ import { Request } from 'express';
 class CryptoInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest<Request>();
-
-    // Decrypt request payload
-    if (req.body && req.body.data) {
-      req.body = decryptPayload(req.body.data);
+    if (req.body?.data) {
+      req.body = decryptPayload(req.body.data as string);
     }
-    // const decrypted: string = decryptPayload(req.body.data);
-    // if (decrypted) {
-    //   req.body = decrypted;
-    // }
     return next.handle().pipe(
       map((data: any) => {
-        // Skip encryption if no data or data is already a string (e.g., HTML response)
         if (data === undefined || data === null || typeof data === 'string')
           return data;
-
-        // Encrypt the response payload
         const encryptedData = encryptPayload(data);
         return { data: encryptedData };
       }),

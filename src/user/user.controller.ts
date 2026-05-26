@@ -1,9 +1,10 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Req, UseGuards } from '@nestjs/common';
 import UserService from './user.service';
 import { JwtService } from '@nestjs/jwt';
 import type { IGoogleLoginRequest } from './models/user.request';
 import { GoogleLoginResponse } from './models/user.response';
 import { ApiResponse } from '../utils/ApiResponse';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('api/users')
 export class UserController {
@@ -18,6 +19,11 @@ export class UserController {
   ): Promise<ApiResponse<GoogleLoginResponse>> {
     return this.userService.googleLogin(payload);
     // Exchange code for ID Token
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Post('current-user')
+  getUser(@Req() req) {
+    return req.user;
   }
   // @Get()
   // async getAllUsers() {
