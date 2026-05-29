@@ -11,7 +11,7 @@ import { AuthService } from '../auth/auth.service';
       // secret: process.env.JWT_SECRET,
       secret:
         'd5qznc8zpew4ze3ex8ln7s8ehdrg45cqutxzbn5pojxbkho1davryf69r8voi4==',
-      signOptions: { expiresIn: '7d' },
+      signOptions: { expiresIn: '10' },
     }),
   ],
   controllers: [UserController],

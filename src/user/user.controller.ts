@@ -23,7 +23,7 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @Post('current-user')
   getUser(@Req() req) {
-    return req.user;
+    return this.userService.getCurrentUser(req.user);
   }
   // @Get()
   // async getAllUsers() {

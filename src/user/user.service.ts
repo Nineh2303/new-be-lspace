@@ -10,8 +10,6 @@ import { IGoogleLoginRequest } from './models/user.request';
 import { GoogleLoginResponse } from './models/user.response';
 import { ApiResponse } from '../utils/ApiResponse';
 import { AuthService } from '../auth/auth.service';
-import { JWTSignPayload } from '../auth/model/JWTSignPayload';
-
 
 @Injectable()
 class UserService {
@@ -19,7 +17,7 @@ class UserService {
 
   constructor(
     @Inject(PrismaService) private readonly prisma: PrismaService,
-    @Inject(AuthService) private readonly auth: AuthService ,
+    @Inject(AuthService) private readonly auth: AuthService,
   ) {}
 
   async googleLogin(
@@ -30,7 +28,6 @@ class UserService {
       const ticket: LoginTicket = await this.client.verifyIdToken({
         idToken: request.credential,
       });
-      console.log(ticket);
       payload = ticket.getPayload();
     } catch (error) {
       console.error('Google token verification failed:', error);
@@ -65,7 +62,7 @@ class UserService {
       const accessToken = this.auth.generateAccessToken({
         email: user.email,
         name: user.name,
-      } as JWTSignPayload);
+      });
 
       return ApiResponse.success(
         new GoogleLoginResponse(
@@ -81,6 +78,26 @@ class UserService {
       console.error('Database operation failed:', error);
 
       throw new InternalServerErrorException('Login failed');
+    }
+  }
+  async getCurrentUser(request: any) {
+    const { email } = request;
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          email: email,
+        },
+      });
+      return ApiResponse.success({
+        email: user?.email,
+        username: user?.name,
+        given_name: user?.given_name,
+        family_name: user?.family_name,
+        image: user?.avatarUrl,
+      });
+    } catch (error) {
+      console.log(error);
+      throw new UnauthorizedException('Google account data is invalid');
     }
   }
 
