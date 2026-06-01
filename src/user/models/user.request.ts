@@ -6,3 +6,4 @@ export interface IGoogleLoginRequest {
 export interface IGetCurrentUser {
   email: string;
 }
+

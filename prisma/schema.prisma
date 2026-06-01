@@ -4,19 +4,27 @@ datasource db {
 }
 
 generator client {
-  provider      = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String
-  avatarUrl   String?
-  given_name String?
-  family_name String?
-  googleId  String?  @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(uuid())
+  email       String   @unique
+  fullName    String
+  phoneNumber String
+  schoolName  String
+  schoolGrade String
+  password    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model School {
+  id              Int    @id @default(autoincrement())
+  schoolCode      String
+  schoolName      String
+  schoolShortName String
+  schoolLogo      String
 }
 
 model VideoItem {
@@ -30,7 +38,7 @@ model VideoItem {
   videoUrl   String?
 }
 
-  model LeaderboardItem {
+model LeaderboardItem {
   id     Int    @id @default(autoincrement())
   rank   Int
   init   String

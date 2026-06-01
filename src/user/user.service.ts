@@ -2,104 +2,85 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { LoginTicket, OAuth2Client, TokenPayload } from 'google-auth-library';
-import { IGoogleLoginRequest } from './models/user.request';
-import { GoogleLoginResponse } from './models/user.response';
 import { ApiResponse } from '../utils/ApiResponse';
 import { AuthService } from '../auth/auth.service';
+import { IUserRegisterResponse } from './models/ response/RegisterUserReponse';
+import * as bcrypt from 'bcrypt';
+import { IRegisterUserRequest } from './models/request/RegisterUserRequest';
+import { BusinessException } from '../common/BusinessException';
 
 @Injectable()
 class UserService {
-  private readonly client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
   constructor(
     @Inject(PrismaService) private readonly prisma: PrismaService,
     @Inject(AuthService) private readonly auth: AuthService,
   ) {}
 
-  async googleLogin(
-    request: IGoogleLoginRequest,
-  ): Promise<ApiResponse<GoogleLoginResponse>> {
-    let payload: TokenPayload | undefined;
-    try {
-      const ticket: LoginTicket = await this.client.verifyIdToken({
-        idToken: request.credential,
-      });
-      payload = ticket.getPayload();
-    } catch (error) {
-      console.error('Google token verification failed:', error);
-      throw new UnauthorizedException('Invalid Google credential');
-    }
-    if (!payload?.email || !payload.name) {
-      throw new UnauthorizedException('Google account data is invalid');
-    }
-    if (!payload.email_verified) {
-      throw new UnauthorizedException('Google email is not verified');
-    }
+  async register(payload: IRegisterUserRequest) {
     try {
       let user = await this.prisma.user.findUnique({
         where: {
           email: payload.email,
         },
       });
-      user ??= await this.prisma.user.create({
+      if (user) {
+        throw new BusinessException('Email already exists');
+      }
+      const hashedPassword = await bcrypt.hash(payload.password, 10);
+      user = await this.prisma.user.create({
         data: {
+          fullName: payload.fullName,
           email: payload.email,
-          name: payload.name,
-          avatarUrl: payload.picture,
-          googleId: payload.sub,
-          given_name: payload.given_name,
-          family_name: payload.family_name,
+          phoneNumber: payload.phoneNumber,
+          schoolGrade: payload.schoolGrade,
+          schoolName: payload.schoolName,
+          password: hashedPassword,
         },
       });
-      /**
-       * TODO:
-       * Generate JWT token here
-       */
+
       const accessToken = this.auth.generateAccessToken({
         email: user.email,
-        name: user.name,
+        name: user.fullName,
       });
 
-      return ApiResponse.success(
-        new GoogleLoginResponse(
-          user.name,
-          user.email,
-          user.avatarUrl ?? undefined,
-          user.given_name ?? undefined,
-          user.family_name ?? undefined,
-          accessToken,
-        ),
-      );
+      const response: IUserRegisterResponse = {
+        email: user.email,
+        fullName: user.fullName,
+        schoolName: user.schoolName,
+        phoneNumber: user.phoneNumber,
+        schoolGrade: user.schoolGrade,
+        accessToken: accessToken,
+      };
+      return ApiResponse.success(response);
     } catch (error) {
       console.error('Database operation failed:', error);
 
       throw new InternalServerErrorException('Login failed');
     }
   }
-  async getCurrentUser(request: any) {
-    const { email } = request;
-    try {
-      const user = await this.prisma.user.findUnique({
-        where: {
-          email: email,
-        },
-      });
-      return ApiResponse.success({
-        email: user?.email,
-        username: user?.name,
-        given_name: user?.given_name,
-        family_name: user?.family_name,
-        image: user?.avatarUrl,
-      });
-    } catch (error) {
-      console.log(error);
-      throw new UnauthorizedException('Google account data is invalid');
-    }
-  }
+
+  // async getCurrentUser(request: any) {
+  //   const { email } = request;
+  //   try {
+  //     const user = await this.prisma.user.findUnique({
+  //       where: {
+  //         email: email,
+  //       },
+  //     });
+  //     return ApiResponse.success({
+  //       email: user?.email,
+  //       username: user?.name,
+  //       given_name: user?.given_name,
+  //       family_name: user?.family_name,
+  //       image: user?.avatarUrl,
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //     throw new UnauthorizedException('Google account data is invalid');
+  //   }
+  // }
 
   // async findAll(): Promise<IUser[]> {
   //   if (this.prisma.getIsConnected()) {

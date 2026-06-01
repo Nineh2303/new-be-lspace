@@ -14,6 +14,11 @@ export class DashboardController {
     return ApiResponse.success(this.dashboardService.getDashboardData());
   }
 
+  @Post('schools')
+  getSchools() {
+    return this.dashboardService.getSchools();
+  }
+
   @Get('health')
   getHealth() {
     return { status: 'ok' };

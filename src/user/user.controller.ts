@@ -1,10 +1,7 @@
-import { Body, Controller, Inject, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Inject, Post } from '@nestjs/common';
 import UserService from './user.service';
 import { JwtService } from '@nestjs/jwt';
-import type { IGoogleLoginRequest } from './models/user.request';
-import { GoogleLoginResponse } from './models/user.response';
-import { ApiResponse } from '../utils/ApiResponse';
-import { AuthGuard } from '@nestjs/passport';
+import type { IRegisterUserRequest } from './models/request/RegisterUserRequest';
 
 @Controller('api/users')
 export class UserController {
@@ -13,18 +10,23 @@ export class UserController {
     @Inject(JwtService) private readonly jwtService: JwtService,
   ) {}
 
-  @Post('google-login')
-  async googleLogin(
-    @Body() payload: IGoogleLoginRequest,
-  ): Promise<ApiResponse<GoogleLoginResponse>> {
-    return this.userService.googleLogin(payload);
-    // Exchange code for ID Token
+  @Post('register')
+  async register(@Body() payload: IRegisterUserRequest) {
+    return this.userService.register(payload);
   }
-  @UseGuards(AuthGuard('jwt'))
-  @Post('current-user')
-  getUser(@Req() req) {
-    return this.userService.getCurrentUser(req.user);
-  }
+
+  // @Post('google-login')
+  // async googleLogin(
+  //   @Body() payload: userRequest.IGoogleLoginRequest,
+  // ): Promise<ApiResponse<GoogleLoginResponse>> {
+  //   return this.userService.googleLogin(payload);
+  //   // Exchange code for ID Token
+  // }
+  // @UseGuards(AuthGuard('jwt'))
+  // @Post('current-user')
+  // getUser(@Req() req) {
+  //   return this.userService.getCurrentUser(req.user);
+  // }
   // @Get()
   // async getAllUsers() {
   //   return this.userService.findAll();

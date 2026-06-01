@@ -8,7 +8,6 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import dotenv from 'dotenv';
 import { ConfigModule } from '@nestjs/config';
-import { LoggerModule } from 'nestjs-pino';
 import CryptoInterceptor from './interceptors/crypto.interceptor';
 
 dotenv.config();
@@ -23,15 +22,6 @@ dotenv.config();
     AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
-    }),
-    LoggerModule.forRoot({
-      pinoHttp: {
-        transport: {
-          target: 'pino-pretty',
-        },
-        autoLogging: true,
-        level: 'debug',
-      },
     }),
   ],
   providers: [
