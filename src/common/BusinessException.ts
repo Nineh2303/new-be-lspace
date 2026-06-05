@@ -1,11 +1,12 @@
-import {
-  HttpException,
-  HttpExceptionOptions,
-} from '@nestjs/common/exceptions/http.exception';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
-export declare class BusinessException extends HttpException {
-  constructor(
-    objectOrError?: any,
-    descriptionOrOptions?: string | HttpExceptionOptions,
-  );
+export class BusinessException extends HttpException {
+  constructor(message: string) {
+    super(
+      {
+        message,
+      },
+      HttpStatus.BAD_REQUEST,
+    );
+  }
 }

@@ -1,5 +1,6 @@
-export interface IRegisterUserRequest {
+export class IRegisterUserRequest {
   fullName: string;
+  userName: string;
   email: string;
   phoneNumber: string;
   schoolName: string;

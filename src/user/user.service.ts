@@ -1,8 +1,4 @@
-import {
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { ApiResponse } from '../utils/ApiResponse';
 import { AuthService } from '../auth/auth.service';
@@ -19,48 +15,55 @@ class UserService {
   ) {}
 
   async register(payload: IRegisterUserRequest) {
-    try {
-      let user = await this.prisma.user.findUnique({
-        where: {
-          email: payload.email,
-        },
-      });
-      if (user) {
-        throw new BusinessException('Email already exists');
-      }
-      const hashedPassword = await bcrypt.hash(payload.password, 10);
-      user = await this.prisma.user.create({
-        data: {
-          fullName: payload.fullName,
-          email: payload.email,
-          phoneNumber: payload.phoneNumber,
-          schoolGrade: payload.schoolGrade,
-          schoolName: payload.schoolName,
-          password: hashedPassword,
-        },
-      });
-
-      const accessToken = this.auth.generateAccessToken({
-        email: user.email,
-        name: user.fullName,
-      });
-
-      const response: IUserRegisterResponse = {
-        email: user.email,
-        fullName: user.fullName,
-        schoolName: user.schoolName,
-        phoneNumber: user.phoneNumber,
-        schoolGrade: user.schoolGrade,
-        accessToken: accessToken,
-      };
-      return ApiResponse.success(response);
-    } catch (error) {
-      console.error('Database operation failed:', error);
-
-      throw new InternalServerErrorException('Login failed');
+    let user;
+    user = await this.prisma.user.findUnique({
+      where: {
+        email: payload.email,
+      },
+    });
+    if (user) {
+      throw new BusinessException('Email đã tồn tại');
     }
+
+    user = await this.prisma.user.findUnique({
+      where: {
+        userName: payload.userName,
+      },
+    });
+    if (user) {
+      throw new BusinessException('Tên đăng nhập đã tồn tại');
+    }
+    const hashedPassword = await bcrypt.hash(payload.password, 10);
+    user = await this.prisma.user.create({
+      data: {
+        fullName: payload.fullName,
+        userName: payload.userName,
+        email: payload.email,
+        phoneNumber: payload.phoneNumber,
+        schoolGrade: payload.schoolGrade,
+        schoolName: payload.schoolName,
+        password: hashedPassword,
+      },
+    });
+
+    const accessToken = this.auth.generateAccessToken({
+      email: user.email,
+      name: user.fullName,
+    });
+
+    const response: IUserRegisterResponse = {
+      email: user.email,
+      fullName: user.fullName,
+      userName: user.userName,
+      schoolName: user.schoolName,
+      phoneNumber: user.phoneNumber,
+      schoolGrade: user.schoolGrade,
+      accessToken: accessToken,
+    };
+    return ApiResponse.success(response);
   }
 
+  // async login(LoginRe)
   // async getCurrentUser(request: any) {
   //   const { email } = request;
   //   try {
