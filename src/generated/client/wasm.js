@@ -96,11 +96,22 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
-  name: 'name',
-  picture: 'picture',
-  googleId: 'googleId',
+  userName: 'userName',
+  fullName: 'fullName',
+  phoneNumber: 'phoneNumber',
+  schoolName: 'schoolName',
+  schoolGrade: 'schoolGrade',
+  password: 'password',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SchoolScalarFieldEnum = {
+  id: 'id',
+  schoolCode: 'schoolCode',
+  schoolName: 'schoolName',
+  schoolShortName: 'schoolShortName',
+  schoolLogo: 'schoolLogo'
 };
 
 exports.Prisma.VideoItemScalarFieldEnum = {
@@ -129,9 +140,57 @@ exports.Prisma.DayActivityScalarFieldEnum = {
   active: 'active'
 };
 
+exports.Prisma.ExamScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  time_limit_minutes: 'time_limit_minutes',
+  passing_score: 'passing_score',
+  is_published: 'is_published',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.QuestionScalarFieldEnum = {
+  id: 'id',
+  exam_id: 'exam_id',
+  content: 'content',
+  question_type: 'question_type',
+  options: 'options',
+  correct_answer: 'correct_answer',
+  explanation: 'explanation',
+  points: 'points',
+  order_index: 'order_index'
+};
+
+exports.Prisma.ExamAttemptScalarFieldEnum = {
+  id: 'id',
+  exam_id: 'exam_id',
+  student_name: 'student_name',
+  student_email: 'student_email',
+  started_at: 'started_at',
+  submitted_at: 'submitted_at',
+  score: 'score',
+  passed: 'passed'
+};
+
+exports.Prisma.AttemptAnswerScalarFieldEnum = {
+  id: 'id',
+  attempt_id: 'attempt_id',
+  question_id: 'question_id',
+  answer: 'answer',
+  is_correct: 'is_correct',
+  points_earned: 'points_earned'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -144,12 +203,23 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+
 
 exports.Prisma.ModelName = {
   User: 'User',
+  School: 'School',
   VideoItem: 'VideoItem',
   LeaderboardItem: 'LeaderboardItem',
-  DayActivity: 'DayActivity'
+  DayActivity: 'DayActivity',
+  Exam: 'Exam',
+  Question: 'Question',
+  ExamAttempt: 'ExamAttempt',
+  AttemptAnswer: 'AttemptAnswer'
 };
 /**
  * Create the Client
@@ -188,7 +258,7 @@ const config = {
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../.env",
+    "rootEnvPath": null,
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../../../prisma",
@@ -207,13 +277,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../src/generated/client\"\n  binaryTargets = [\"native\", \"windows\", \"debian-openssl-3.0.x\"]\n}\n\nmodel User {\n  id        String   @id @default(uuid())\n  email     String   @unique\n  name      String\n  picture   String?\n  googleId  String?  @unique\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel VideoItem {\n  id         Int     @id @default(autoincrement())\n  category   String\n  thumbnail  String\n  title      String\n  duration   String\n  instructor String\n  views      String\n  videoUrl   String?\n}\n\nmodel LeaderboardItem {\n  id     Int    @id @default(autoincrement())\n  rank   Int\n  init   String\n  name   String\n  type   String\n  points String\n}\n\nmodel DayActivity {\n  id     Int       @id @default(autoincrement())\n  day    String\n  active Boolean[]\n}\n",
-  "inlineSchemaHash": "2f70d3896fdb8a19d56da08bbb07fb6ed77bd64e198d0961943b44d033c8cf28",
+  "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../src/generated/client\"\n  binaryTargets = [\"native\", \"windows\", \"debian-openssl-3.0.x\"]\n}\n\nmodel User {\n  id          String   @id @default(uuid())\n  email       String   @unique\n  userName    String   @unique\n  fullName    String\n  phoneNumber String\n  schoolName  String\n  schoolGrade String\n  password    String\n  createdAt   DateTime @default(now())\n  updatedAt   DateTime @updatedAt\n}\n\nmodel School {\n  id              Int     @id @default(autoincrement())\n  schoolCode      String\n  schoolName      String\n  schoolShortName String\n  schoolLogo      String?\n}\n\nmodel VideoItem {\n  id         Int     @id @default(autoincrement())\n  category   String\n  thumbnail  String\n  title      String\n  duration   String\n  instructor String\n  views      String\n  videoUrl   String?\n}\n\nmodel LeaderboardItem {\n  id     Int    @id @default(autoincrement())\n  rank   Int\n  init   String\n  name   String\n  type   String\n  points String\n}\n\nmodel DayActivity {\n  id     Int       @id @default(autoincrement())\n  day    String\n  active Boolean[]\n}\n\n// ─── Examination ─────────────────────────────────────────────────────────────\n\nmodel Exam {\n  id                 String        @id @default(uuid())\n  title              String\n  description        String?\n  time_limit_minutes Int?\n  passing_score      Int           @default(50)\n  is_published       Boolean       @default(false)\n  created_at         DateTime      @default(now())\n  updated_at         DateTime      @updatedAt\n  questions          Question[]\n  attempts           ExamAttempt[]\n}\n\nmodel Question {\n  id             String          @id @default(uuid())\n  exam_id        String\n  content        String\n  question_type  String // multiple_choice | true_false | short_answer\n  options        Json? // [{ id: string, text: string }]\n  correct_answer String?\n  explanation    String?\n  points         Int             @default(1)\n  order_index    Int             @default(0)\n  exam           Exam            @relation(fields: [exam_id], references: [id], onDelete: Cascade)\n  answers        AttemptAnswer[]\n}\n\nmodel ExamAttempt {\n  id            String          @id @default(uuid())\n  exam_id       String\n  student_name  String\n  student_email String\n  started_at    DateTime        @default(now())\n  submitted_at  DateTime?\n  score         Float?\n  passed        Boolean?\n  exam          Exam            @relation(fields: [exam_id], references: [id], onDelete: Cascade)\n  answers       AttemptAnswer[]\n}\n\nmodel AttemptAnswer {\n  id            String      @id @default(uuid())\n  attempt_id    String\n  question_id   String\n  answer        String?\n  is_correct    Boolean?\n  points_earned Int         @default(0)\n  attempt       ExamAttempt @relation(fields: [attempt_id], references: [id], onDelete: Cascade)\n  question      Question    @relation(fields: [question_id], references: [id], onDelete: Cascade)\n}\n",
+  "inlineSchemaHash": "c3743af7e180e680a87f6cb9b064c810ed8b4f26a596c5caf64b6ff4a7fb3ee8",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"picture\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"googleId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"VideoItem\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"category\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"thumbnail\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"duration\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"instructor\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"views\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"videoUrl\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null},\"LeaderboardItem\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"rank\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"init\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"points\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null},\"DayActivity\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"day\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"active\",\"kind\":\"scalar\",\"type\":\"Boolean\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fullName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phoneNumber\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"schoolName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"schoolGrade\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"School\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"schoolCode\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"schoolName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"schoolShortName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"schoolLogo\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null},\"VideoItem\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"category\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"thumbnail\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"duration\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"instructor\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"views\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"videoUrl\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null},\"LeaderboardItem\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"rank\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"init\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"points\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null},\"DayActivity\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"day\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"active\",\"kind\":\"scalar\",\"type\":\"Boolean\"}],\"dbName\":null},\"Exam\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"description\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"time_limit_minutes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"passing_score\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"is_published\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"questions\",\"kind\":\"object\",\"type\":\"Question\",\"relationName\":\"ExamToQuestion\"},{\"name\":\"attempts\",\"kind\":\"object\",\"type\":\"ExamAttempt\",\"relationName\":\"ExamToExamAttempt\"}],\"dbName\":null},\"Question\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"exam_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"content\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"question_type\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"options\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"correct_answer\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"explanation\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"points\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"order_index\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"exam\",\"kind\":\"object\",\"type\":\"Exam\",\"relationName\":\"ExamToQuestion\"},{\"name\":\"answers\",\"kind\":\"object\",\"type\":\"AttemptAnswer\",\"relationName\":\"AttemptAnswerToQuestion\"}],\"dbName\":null},\"ExamAttempt\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"exam_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"student_name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"student_email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"started_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"submitted_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"score\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"passed\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"exam\",\"kind\":\"object\",\"type\":\"Exam\",\"relationName\":\"ExamToExamAttempt\"},{\"name\":\"answers\",\"kind\":\"object\",\"type\":\"AttemptAnswer\",\"relationName\":\"AttemptAnswerToExamAttempt\"}],\"dbName\":null},\"AttemptAnswer\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"attempt_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"question_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"answer\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"is_correct\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"points_earned\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"attempt\",\"kind\":\"object\",\"type\":\"ExamAttempt\",\"relationName\":\"AttemptAnswerToExamAttempt\"},{\"name\":\"question\",\"kind\":\"object\",\"type\":\"Question\",\"relationName\":\"AttemptAnswerToQuestion\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

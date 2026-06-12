@@ -124,11 +124,22 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
-  name: 'name',
-  picture: 'picture',
-  googleId: 'googleId',
+  userName: 'userName',
+  fullName: 'fullName',
+  phoneNumber: 'phoneNumber',
+  schoolName: 'schoolName',
+  schoolGrade: 'schoolGrade',
+  password: 'password',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SchoolScalarFieldEnum = {
+  id: 'id',
+  schoolCode: 'schoolCode',
+  schoolName: 'schoolName',
+  schoolShortName: 'schoolShortName',
+  schoolLogo: 'schoolLogo'
 };
 
 exports.Prisma.VideoItemScalarFieldEnum = {
@@ -157,9 +168,57 @@ exports.Prisma.DayActivityScalarFieldEnum = {
   active: 'active'
 };
 
+exports.Prisma.ExamScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  time_limit_minutes: 'time_limit_minutes',
+  passing_score: 'passing_score',
+  is_published: 'is_published',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.QuestionScalarFieldEnum = {
+  id: 'id',
+  exam_id: 'exam_id',
+  content: 'content',
+  question_type: 'question_type',
+  options: 'options',
+  correct_answer: 'correct_answer',
+  explanation: 'explanation',
+  points: 'points',
+  order_index: 'order_index'
+};
+
+exports.Prisma.ExamAttemptScalarFieldEnum = {
+  id: 'id',
+  exam_id: 'exam_id',
+  student_name: 'student_name',
+  student_email: 'student_email',
+  started_at: 'started_at',
+  submitted_at: 'submitted_at',
+  score: 'score',
+  passed: 'passed'
+};
+
+exports.Prisma.AttemptAnswerScalarFieldEnum = {
+  id: 'id',
+  attempt_id: 'attempt_id',
+  question_id: 'question_id',
+  answer: 'answer',
+  is_correct: 'is_correct',
+  points_earned: 'points_earned'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -172,12 +231,23 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+
 
 exports.Prisma.ModelName = {
   User: 'User',
+  School: 'School',
   VideoItem: 'VideoItem',
   LeaderboardItem: 'LeaderboardItem',
-  DayActivity: 'DayActivity'
+  DayActivity: 'DayActivity',
+  Exam: 'Exam',
+  Question: 'Question',
+  ExamAttempt: 'ExamAttempt',
+  AttemptAnswer: 'AttemptAnswer'
 };
 
 /**

@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { DashboardModule } from './dashboard/dashboard.module';
 import UserModule from './user/user.module';
 import { VideoModule } from './video/video.module';
@@ -6,6 +6,7 @@ import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { ActivityModule } from './activity/activity.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
+import { ExamModule } from './exam/exam.module';
 import dotenv from 'dotenv';
 import { ConfigModule } from '@nestjs/config';
 import CryptoInterceptor from './interceptors/crypto.interceptor';
@@ -20,6 +21,7 @@ dotenv.config();
     ActivityModule,
     DashboardModule,
     AuthModule,
+    ExamModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
